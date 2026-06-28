@@ -100,6 +100,7 @@ interface Orderbooker {
 interface PostedReceipt {
   shopName: string;
   shopArea: string | null;
+  shopAddress: string | null;
   amount: number;
   description: string;
   newBalance: number;
@@ -649,6 +650,7 @@ export default function AdminCreditPosting() {
         setPostedReceipt({
           shopName: selectedShop.name,
           shopArea: selectedShop.area,
+          shopAddress: selectedShop.address || null,
           amount,
           description: desc,
           previousBalance: txn.previousBalance ?? selectedShop.balance,
@@ -1361,13 +1363,19 @@ export default function AdminCreditPosting() {
                             {isSearchActive && shop.area
                               ? highlightMatch(shop.area, debouncedSearch)
                               : (shop.area || '—')}
+                            {shop.address ? ` · ${shop.address}` : ''}
                           </p>
                         </div>
                       </TableCell>
                       <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
-                        {isSearchActive && shop.area
-                          ? highlightMatch(shop.area, debouncedSearch)
-                          : (shop.area || '—')}
+                        <div>
+                          {isSearchActive && shop.area
+                            ? highlightMatch(shop.area, debouncedSearch)
+                            : (shop.area || '—')}
+                          {shop.address ? (
+                            <p className="text-[10px] text-muted-foreground/70">{shop.address}</p>
+                          ) : null}
+                        </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         <Badge variant="outline" className="text-[10px] font-medium">{shop.routeDays.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(', ')}</Badge>
@@ -2450,6 +2458,12 @@ export default function AdminCreditPosting() {
                       <tr className="border-b border-border/40">
                         <td className="px-5 py-2.5 text-muted-foreground font-medium">Area</td>
                         <td className="px-5 py-2.5 text-right text-sm">{postedReceipt.shopArea}</td>
+                      </tr>
+                    )}
+                    {postedReceipt.shopAddress && (
+                      <tr className="border-b border-border/40">
+                        <td className="px-5 py-2.5 text-muted-foreground font-medium">Address</td>
+                        <td className="px-5 py-2.5 text-right text-sm">{postedReceipt.shopAddress}</td>
                       </tr>
                     )}
                     <tr className="border-b border-border/40">
