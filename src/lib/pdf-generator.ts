@@ -173,7 +173,7 @@ export async function generateLedgerPDF(ledger: LedgerData) {
     const row: (string | number)[] = [
       idx + 1,
       formatDate(txn.createdAt),
-      txn.type === 'credit' ? 'Credit' : txn.type === 'claim' ? 'Claim' : 'Recovery',
+      txn.type === 'credit' ? 'Credit' : txn.type === 'claim' ? 'Claim' : txn.type === 'supplier_collection' ? 'Supp. Coll.' : 'Recovery',
     ];
     if (hasCompanyInfo) {
       row.push(txn.company?.name || '—');

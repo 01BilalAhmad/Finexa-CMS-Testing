@@ -829,6 +829,11 @@ export default function AdminTransactions() {
                               <ShieldAlert className="h-3 w-3 mr-0.5" />
                               Claim
                             </Badge>
+                          ) : txn.type === 'supplier_collection' ? (
+                            <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300 border-orange-200 dark:border-orange-800 text-[10px] w-fit">
+                              <TrendingUp className="h-3 w-3 mr-0.5" />
+                              Supp. Coll.
+                            </Badge>
                           ) : (
                             <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 text-[10px] w-fit">
                               <TrendingUp className="h-3 w-3 mr-0.5" />

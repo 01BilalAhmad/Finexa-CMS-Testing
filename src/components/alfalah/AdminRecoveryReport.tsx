@@ -211,6 +211,7 @@ export default function AdminRecoveryReport() {
   const [fetchingDropdowns, setFetchingDropdowns] = useState(false);
   const [shopSearch, setShopSearch] = useState('');
   const [addCompanyId, setAddCompanyId] = useState<string>('');
+  const [addRecoveryType, setAddRecoveryType] = useState<'recovery' | 'supplier_collection'>('recovery');
 
   // Company filter state
   const [companies, setCompanies] = useState<{ id: string; name: string }[]>([]);
@@ -411,7 +412,7 @@ export default function AdminRecoveryReport() {
   };
 
   // ─── Add Recovery Handlers ───
-  const openAddDialog = async () => {
+  const openAddDialog = async (type?: 'recovery' | 'supplier_collection') => {
     setAddStep(1);
     setSelectedOBId('');
     setSelectedShopId('');
@@ -420,6 +421,7 @@ export default function AdminRecoveryReport() {
     setAddRecoveryDate(getLocalDateString());
     setShopSearch('');
     setAddCompanyId('');
+    setAddRecoveryType(type || 'recovery');
     setShops([]);
     setAddDialogOpen(true);
     setFetchingDropdowns(true);
@@ -487,19 +489,24 @@ export default function AdminRecoveryReport() {
         } catch { /* non-blocking */ }
       }
 
-      const res = await apiFetch('/api/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          shopId: selectedShopId,
-          type: 'recovery',
-          amount: parseFloat(addAmount),
-          description: addDescription.trim() || undefined,
-          createdBy: user.id,
-          companyId: companyIdToUse || undefined,
-          customDate: addRecoveryDate !== getLocalDateString() ? addRecoveryDate : undefined,
-        }),
-      });
+      const res = await apiFetch(
+        addRecoveryType === 'supplier_collection'
+          ? '/api/transactions/supplier-collection'
+          : '/api/transactions',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            shopId: selectedShopId,
+            type: addRecoveryType === 'supplier_collection' ? undefined : 'recovery',
+            amount: parseFloat(addAmount),
+            description: addDescription.trim() || undefined,
+            createdBy: user.id,
+            companyId: companyIdToUse || undefined,
+            customDate: addRecoveryType === 'supplier_collection' ? undefined : (addRecoveryDate !== getLocalDateString() ? addRecoveryDate : undefined),
+          }),
+        }
+      );
       if (res.ok) {
         const txn = await res.json();
         toast({ title: 'Added', description: 'Recovery entry added successfully' });
@@ -560,12 +567,27 @@ export default function AdminRecoveryReport() {
           {/* Add Recovery Button */}
           <Button
             type="button"
-            onClick={openAddDialog}
+            onClick={() => {
+              openAddDialog('recovery');
+            }}
             className="bg-green-600 hover:bg-green-700 text-white "
             size="sm"
           >
             <Plus className="h-4 w-4 mr-1.5" />
             Add Recovery
+          </Button>
+          {/* Add Supplier Collection Button */}
+          <Button
+            type="button"
+            onClick={() => {
+              openAddDialog();
+              setAddRecoveryType('supplier_collection');
+            }}
+            className="bg-orange-600 hover:bg-orange-700 text-white"
+            size="sm"
+          >
+            <Plus className="h-4 w-4 mr-1.5" />
+            Supplier Collection
           </Button>
           <div className="relative">
             <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -1208,7 +1230,7 @@ export default function AdminRecoveryReport() {
       }}>
         <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>Add Recovery</DialogTitle>
+            <DialogTitle>{addRecoveryType === 'supplier_collection' ? 'Add Supplier Collection' : 'Add Recovery'}</DialogTitle>
             <DialogDescription>
               {addStep === 1 && 'Step 1: Select an orderbooker'}
               {addStep === 2 && 'Step 2: Select a shop'}

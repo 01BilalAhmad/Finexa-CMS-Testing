@@ -55,7 +55,7 @@ export async function recalcShopBalances(
     if (isApproved) {
       if (t.type === 'credit') {
         runningBalance += amount;
-      } else if (t.type === 'recovery') {
+      } else if (t.type === 'recovery' || t.type === 'supplier_collection') {
         runningBalance -= amount;
       } else if (t.type === 'claim') {
         runningBalance -= amount;
@@ -64,10 +64,11 @@ export async function recalcShopBalances(
       // Track per-company totals (only for transactions with a companyId)
       if (companyId) {
         if (!companyTotals[companyId]) {
-          companyTotals[companyId] = { credit: 0, recovery: 0, claim: 0 };
+          companyTotals[companyId] = { credit: 0, recovery: 0, claim: 0, supplier_collection: 0 };
         }
         if (t.type === 'credit') companyTotals[companyId].credit += amount;
         else if (t.type === 'recovery') companyTotals[companyId].recovery += amount;
+        else if (t.type === 'supplier_collection') companyTotals[companyId].supplier_collection += amount;
         else if (t.type === 'claim') companyTotals[companyId].claim += amount;
       }
     }
@@ -93,7 +94,7 @@ export async function recalcShopBalances(
   const correctCompanyBalances: Record<string, number> = {};
   for (const [compId, totals] of Object.entries(companyTotals)) {
     correctCompanyBalances[compId] =
-      Math.round((totals.credit - totals.recovery - totals.claim) * 100) / 100;
+      Math.round((totals.credit - totals.recovery - totals.supplier_collection - totals.claim) * 100) / 100;
   }
 
   // 4. Update ShopCompanyBalance entries
