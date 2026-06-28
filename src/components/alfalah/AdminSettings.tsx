@@ -865,8 +865,8 @@ export default function AdminSettings() {
       toast({ title: 'Missing Fields', description: 'Please fill in all password fields.', variant: 'destructive' });
       return;
     }
-    if (newPassword.length < 6) {
-      toast({ title: 'Weak Password', description: 'New password must be at least 6 characters.', variant: 'destructive' });
+    if (newPassword.length < 8) {
+      toast({ title: 'Weak Password', description: 'New password must be at least 8 characters.', variant: 'destructive' });
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -884,7 +884,7 @@ export default function AdminSettings() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: user.username,
+          userId: user.id,
           currentPassword,
           newPassword,
         }),
@@ -1226,10 +1226,10 @@ export default function AdminSettings() {
                         {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
-                    {newPassword.length > 0 && newPassword.length < 6 && (
-                      <p className="text-[11px] text-red-500 dark:text-red-400">Password must be at least 6 characters</p>
+                    {newPassword.length > 0 && newPassword.length < 8 && (
+                      <p className="text-[11px] text-red-500 dark:text-red-400">Password must be at least 8 characters</p>
                     )}
-                    {newPassword.length >= 6 && (
+                    {newPassword.length >= 8 && (
                       <p className="text-[11px] text-emerald-600 dark:text-emerald-400">Password strength: OK</p>
                     )}
                   </div>
@@ -1257,7 +1257,7 @@ export default function AdminSettings() {
                     {confirmPassword.length > 0 && newPassword !== confirmPassword && (
                       <p className="text-[11px] text-red-500 dark:text-red-400">Passwords do not match</p>
                     )}
-                    {confirmPassword.length > 0 && newPassword === confirmPassword && newPassword.length >= 6 && (
+                    {confirmPassword.length > 0 && newPassword === confirmPassword && newPassword.length >= 8 && (
                       <p className="text-[11px] text-emerald-600 dark:text-emerald-400">Passwords match</p>
                     )}
                   </div>

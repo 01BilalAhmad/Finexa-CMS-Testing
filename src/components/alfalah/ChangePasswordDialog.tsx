@@ -189,7 +189,7 @@ export default function ChangePasswordDialog({ open, onOpenChange }: ChangePassw
   // Validation states
   const currentError = undefined; // Current password has no client-side validation beyond presence
   const newError =
-    newPassword.length > 0 && newPassword.length < 6
+    newPassword.length > 0 && newPassword.length < 8
       ? 'Minimum 6 characters required'
       : newPassword.length > 0 && currentPassword && newPassword === currentPassword
         ? 'New password must be different from current'
@@ -199,11 +199,11 @@ export default function ChangePasswordDialog({ open, onOpenChange }: ChangePassw
       ? 'Passwords do not match'
       : undefined;
   const confirmMatch =
-    confirmPassword.length > 0 && newPassword === confirmPassword && newPassword.length >= 6;
+    confirmPassword.length > 0 && newPassword === confirmPassword && newPassword.length >= 8;
 
   const isValid =
     currentPassword.length > 0 &&
-    newPassword.length >= 6 &&
+    newPassword.length >= 8 &&
     confirmPassword.length > 0 &&
     newPassword === confirmPassword &&
     newPassword !== currentPassword;
