@@ -534,6 +534,7 @@ export default function AdminRecoveryReport() {
           remainingBalance: txn.newBalance,
           description: addDescription.trim() || null,
           transactionId: txn.id,
+          receiptType: addRecoveryType,
         });
         setReceiptDialogOpen(true);
 

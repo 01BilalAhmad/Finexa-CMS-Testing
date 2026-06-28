@@ -37,6 +37,8 @@ export interface RecoveryReceiptData {
   description: string | null;
   // Transaction ID
   transactionId: string;
+  // Receipt type: 'recovery' | 'supplier_collection'
+  receiptType?: 'recovery' | 'supplier_collection';
 }
 
 interface RecoveryReceiptDialogProps {
@@ -67,6 +69,10 @@ export default function RecoveryReceiptDialog({ open, onOpenChange, receipt }: R
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  const isSupplierCollection = receipt?.receiptType === 'supplier_collection';
+  const receiptTitleStr = isSupplierCollection ? 'Supplier Collection Receipt' : 'Recovery Receipt';
+  const receiptTitleUpper = isSupplierCollection ? 'SUPPLIER COLLECTION RECEIPT' : 'RECOVERY RECEIPT';
+
   // ─── Print Receipt ───
   const handlePrint = () => {
     const el = receiptRef.current;
@@ -87,7 +93,7 @@ export default function RecoveryReceiptDialog({ open, onOpenChange, receipt }: R
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Recovery Receipt</title>
+  <title>${receiptTitleStr}</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -245,8 +251,10 @@ export default function RecoveryReceiptDialog({ open, onOpenChange, receipt }: R
 
     const bName = receipt.businessName || businessName || 'AL-FALAH TRADERS';
     const bPhone = receipt.businessPhone || businessPhone || '';
+    const isSupplierCollection = receipt.receiptType === 'supplier_collection';
+    const receiptTitleStr = isSupplierCollection ? 'SUPPLIER COLLECTION RECEIPT' : 'RECOVERY RECEIPT';
 
-    let msg = `🧾 *RECOVERY RECEIPT*\n`;
+    let msg = `🧾 *${receiptTitleStr}*\n`;
     msg += `━━━━━━━━━━━━━━━━━━\n`;
     msg += `🏢 *${bName}*\n`;
     if (bPhone) msg += `📞 ${bPhone}\n`;
@@ -297,11 +305,11 @@ export default function RecoveryReceiptDialog({ open, onOpenChange, receipt }: R
     const bName = receipt.businessName || businessName || 'AL-FALAH TRADERS';
     const bPhone = receipt.businessPhone || businessPhone || '';
 
-    const text = `Recovery Receipt - ${bName}\nShop: ${receipt.shopName}\nAmount: Rs. ${receipt.recoveryAmount.toLocaleString('en-PK')}\nDate: ${receipt.date}`;
+    const text = `${receiptTitleStr} - ${bName}\nShop: ${receipt.shopName}\nAmount: Rs. ${receipt.recoveryAmount.toLocaleString('en-PK')}\nDate: ${receipt.date}`;
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Recovery Receipt', text });
+        await navigator.share({ title: receiptTitleStr, text });
       } catch {
         // User cancelled
       }
@@ -326,7 +334,7 @@ export default function RecoveryReceiptDialog({ open, onOpenChange, receipt }: R
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md p-0 overflow-hidden">
         <DialogHeader className="sr-only">
-          <DialogTitle>Recovery Receipt</DialogTitle>
+          <DialogTitle>{receiptTitleStr}</DialogTitle>
           <DialogDescription>Recovery transaction receipt</DialogDescription>
         </DialogHeader>
 
@@ -337,7 +345,7 @@ export default function RecoveryReceiptDialog({ open, onOpenChange, receipt }: R
 
               {/* Blue Header Bar */}
               <div className="bg-[#4169E1] text-white text-center py-3.5 px-5">
-                <h2 className="text-sm font-bold tracking-wider uppercase">Recovery Receipt</h2>
+                <h2 className="text-sm font-bold tracking-wider uppercase">{receiptTitleUpper}</h2>
               </div>
 
               {/* Business Info - Dark Navy */}
@@ -354,7 +362,7 @@ export default function RecoveryReceiptDialog({ open, onOpenChange, receipt }: R
               {/* Green Recovery Badge */}
               <div className="text-center -mt-3.5 relative z-10">
                 <span className="inline-block bg-[#10B981] text-white text-[10px] font-bold tracking-[1.5px] uppercase px-5 py-1.5 rounded-full">
-                  Recovery Receipt
+                  {receiptTitleUpper}
                 </span>
               </div>
 
@@ -531,17 +539,19 @@ function buildPrintHTML(receipt: RecoveryReceiptData | null, businessName: strin
   const bPhone = receipt.businessPhone || businessPhone || '';
   const fmtPKR = (n: number) => `Rs. ${n.toLocaleString('en-PK')}`;
   const amountWords = receipt ? numberToWords(receipt.recoveryAmount) + ' Rupees Only' : '';
+  const isSuppColl = receipt.receiptType === 'supplier_collection';
+  const titleStr = isSuppColl ? 'Supplier Collection Receipt' : 'Recovery Receipt';
 
   return `
     <div class="receipt-card">
       <div class="blue-header">
-        <h2>Recovery Receipt</h2>
+        <h2>${titleStr}</h2>
       </div>
       <div class="business-section">
         <h1>${bName}</h1>
         ${bPhone ? `<div class="phone-text">📞 ${bPhone}</div>` : ''}
       </div>
-      <div class="receipt-badge"><span>Recovery Receipt</span></div>
+      <div class="receipt-badge"><span>${titleStr}</span></div>
       <div class="txn-row">
         <div><div class="label">Transaction ID</div><div class="value">#${receipt!.transactionId.slice(0, 8).toUpperCase()}</div></div>
         <div style="text-align:right"><div class="label">Date</div><div class="value">${receipt!.date}</div></div>

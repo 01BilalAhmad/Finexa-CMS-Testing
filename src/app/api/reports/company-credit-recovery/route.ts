@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
        LEFT JOIN "Shop" s ON t."shopId" = s.id
        WHERE t."companyId" = $3
          AND s."orderbookerId" IN (${obPlaceholders})
-         AND t.type = 'recovery'
+         AND t.type IN ('recovery', 'supplier_collection')
          AND t.status = 'approved'
          AND t."createdAt" >= $1
          AND t."createdAt" <= $2
