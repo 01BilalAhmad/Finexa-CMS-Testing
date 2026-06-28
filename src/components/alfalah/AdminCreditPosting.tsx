@@ -113,6 +113,7 @@ interface TodaySummaryItem {
   shopId: string;
   shopName: string;
   shopArea: string | null;
+  shopAddress: string | null;
   totalAmount: number;
   transactionCount: number;
 }
@@ -382,6 +383,7 @@ export default function AdminCreditPosting() {
               shopId: txn.shop.id,
               shopName: txn.shop.name,
               shopArea: txn.shop.area,
+              shopAddress: (txn.shop as any).address || null,
               totalAmount: txn.amount,
               transactionCount: 1,
             });
@@ -1343,7 +1345,7 @@ export default function AdminCreditPosting() {
                 <TableHeader>
                   <TableRow className="bg-primary hover:bg-transparent">
                     <TableHead className="text-white font-semibold text-xs">Shop Name</TableHead>
-                    <TableHead className="text-white font-semibold text-xs hidden sm:table-cell">Area</TableHead>
+                    <TableHead className="text-white font-semibold text-xs hidden sm:table-cell">Address</TableHead>
                     <TableHead className="text-white font-semibold text-xs hidden md:table-cell">Route</TableHead>
                     <TableHead className="text-white font-semibold text-xs text-right">Balance</TableHead>
                     <TableHead className="text-white font-semibold text-xs text-center">Action</TableHead>
@@ -1369,12 +1371,14 @@ export default function AdminCreditPosting() {
                       </TableCell>
                       <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
                         <div>
-                          {isSearchActive && shop.area
-                            ? highlightMatch(shop.area, debouncedSearch)
-                            : (shop.area || '—')}
                           {shop.address ? (
-                            <p className="text-[10px] text-muted-foreground/70">{shop.address}</p>
-                          ) : null}
+                            <>
+                              <p className="text-sm font-medium">{shop.address}</p>
+                              <p className="text-[10px] text-muted-foreground/60">{shop.area}</p>
+                            </>
+                          ) : (
+                            <span>{shop.area || '—'}</span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
@@ -1477,7 +1481,7 @@ export default function AdminCreditPosting() {
                     <TableRow className="bg-primary hover:bg-transparent">
                       <TableHead className="text-white font-semibold text-xs">#</TableHead>
                       <TableHead className="text-white font-semibold text-xs">Shop Name</TableHead>
-                      <TableHead className="text-white font-semibold text-xs hidden sm:table-cell">Area</TableHead>
+                      <TableHead className="text-white font-semibold text-xs hidden sm:table-cell">Address</TableHead>
                       <TableHead className="text-white font-semibold text-xs text-center hidden sm:table-cell">Entries</TableHead>
                       <TableHead className="text-white font-semibold text-xs text-right">Amount</TableHead>
                       <TableHead className="text-white font-semibold text-xs text-center">Actions</TableHead>
@@ -1488,7 +1492,16 @@ export default function AdminCreditPosting() {
                       <TableRow key={item.shopId} className={`${idx % 2 === 0 ? 'data-table-row-even' : 'data-table-row-odd'} transition-colors`}>
                         <TableCell className="text-xs text-muted-foreground font-medium">{idx + 1}</TableCell>
                         <TableCell className="font-medium text-sm">{item.shopName}</TableCell>
-                        <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">{item.shopArea || '—'}</TableCell>
+                        <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
+                          {item.shopAddress ? (
+                            <>
+                              <p className="text-sm font-medium">{item.shopAddress}</p>
+                              <p className="text-[10px] text-muted-foreground/60">{item.shopArea}</p>
+                            </>
+                          ) : (
+                            <span>{item.shopArea || '—'}</span>
+                          )}
+                        </TableCell>
                         <TableCell className="hidden sm:table-cell text-center text-sm text-muted-foreground">{item.transactionCount}</TableCell>
                         <TableCell className="text-right font-semibold text-sm text-foreground">{formatPKR(item.totalAmount)}</TableCell>
                         <TableCell className="text-center">
